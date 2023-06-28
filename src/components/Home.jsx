@@ -1,10 +1,26 @@
 import { Box } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SearchExercises, HeroBanner, Exercises } from ".";
+import { fetchData } from "../utils/api";
 
 const Home = () => {
   const [exercises, setExercises] = useState([]);
   const [bodyPart, setBodyPart] = useState("");
+  useEffect(() => {
+    let data = [];
+    const fetchExercise = async () => {
+      if (bodyPart == "all") {
+        data = await fetchData();
+      } else {
+        data = await fetchData(`bodyPart/${bodyPart}`);
+      }
+      if (!data.message && !data.error) {
+        console.log("data", data);
+        setExercises(data);
+      }
+    };
+    fetchExercise();
+  }, [bodyPart]);
   return (
     <Box>
       <HeroBanner />
@@ -13,12 +29,7 @@ const Home = () => {
         setBodyPart={setBodyPart}
         bodyPart={bodyPart}
       />
-      <Exercises
-        setExercises={setExercises}
-        setBodyPart={setBodyPart}
-        bodyPart={bodyPart}
-        exercises={exercises}
-      />
+      <Exercises exercises={exercises} />
     </Box>
   );
 };
